@@ -1,0 +1,3 @@
+# nixpacks.toml - Install system dependencies on Render
+[phases.setup]
+nixPkgs = ["ffmpeg"]
