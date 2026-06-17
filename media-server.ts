@@ -3,9 +3,11 @@ import fs from "fs";
 import { Server as SocketIOServer } from "socket.io";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const NodeMediaServer = require("node-media-server");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ffmpegStatic = require("ffmpeg-static");
 
 const RTMP_PORT = parseInt(process.env.RTMP_PORT || "1935", 10);
-const HTTP_PORT = parseInt(process.env.HTTP_PORT || "8000", 10); // NMS HTTP server + Socket.io
+const HTTP_PORT = parseInt(process.env.PORT || process.env.HTTP_PORT || "8000", 10); // NMS HTTP server + Socket.io (Render uses PORT env)
 const MEDIA_ROOT = "media";
 
 if (!fs.existsSync(MEDIA_ROOT)) {
@@ -27,7 +29,7 @@ const nmsConfig = {
     allow_origin: "*",
   },
   trans: {
-    ffmpeg: process.env.FFMPEG_PATH || "ffmpeg",
+    ffmpeg: process.env.FFMPEG_PATH || ffmpegStatic,
     tasks: [
       {
         app: "live",

@@ -7,6 +7,8 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 // NMS v2 — has full HLS transcoding via ffmpeg
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const NodeMediaServer = require("node-media-server");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ffmpegStatic = require("ffmpeg-static");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOST || "localhost";
@@ -39,7 +41,7 @@ const nmsConfig = {
     allow_origin: "*",
   },
   trans: {
-    ffmpeg: process.env.FFMPEG_PATH || "C:\\Users\\Kavya\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.0.1-full_build\\bin\\ffmpeg.exe",
+    ffmpeg: process.env.FFMPEG_PATH || ffmpegStatic,
     tasks: [
       {
         app: "live",
