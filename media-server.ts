@@ -1,5 +1,7 @@
 import path from "path";
 import fs from "fs";
+import express from "express";
+import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const NodeMediaServer = require("node-media-server");
@@ -7,7 +9,7 @@ const NodeMediaServer = require("node-media-server");
 const ffmpegStatic = require("ffmpeg-static");
 
 const RTMP_PORT = parseInt(process.env.RTMP_PORT || "1935", 10);
-const HTTP_PORT = parseInt(process.env.PORT || process.env.HTTP_PORT || "8000", 10); // NMS HTTP server + Socket.io (Render uses PORT env)
+const HTTP_PORT = parseInt(process.env.PORT || process.env.HTTP_PORT || "8000", 10); // exposed port for HTTP + Socket.io
 const MEDIA_ROOT = "media";
 
 if (!fs.existsSync(MEDIA_ROOT)) {
@@ -24,7 +26,7 @@ const nmsConfig = {
     ping_timeout: 60,
   },
   http: {
-    port: HTTP_PORT,
+    port: 8001, // Dummy local port, not exposed to public traffic to avoid ws conflicts
     mediaroot: MEDIA_ROOT,
     allow_origin: "*",
   },
@@ -58,10 +60,24 @@ const nms = new NodeMediaServer(nmsConfig);
 nms.run();
 
 console.log(`📡 RTMP  → rtmp://localhost:${RTMP_PORT}/live/<room-id>`);
-console.log(`🎞  HLS   → http://localhost:${HTTP_PORT}/live/<room-id>/index.m3u8`);
+console.log(`🎞  HLS (NMS internal) → http://localhost:8001/live/<room-id>/index.m3u8`);
+
+// ── Custom Express + HTTP server on HTTP_PORT ─────────────────────────────────
+const app = express();
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+app.use(express.static(MEDIA_ROOT));
+
+const httpServer = createServer(app);
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`📡 Public HTTP + Socket.io Server running on port ${HTTP_PORT}`);
+});
 
 // ── Socket.io ─────────────────────────────────────────────────────────────────
-const io = new SocketIOServer(nms.nhs.httpServer, {
+const io = new SocketIOServer(httpServer, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
 
