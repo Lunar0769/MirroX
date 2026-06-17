@@ -175,7 +175,7 @@ export default function LandingPage() {
                     </li>
                     <li className="flex gap-2">
                       <span className="text-indigo-400 font-bold shrink-0">3</span>
-                      Server: <code className="bg-gray-800 px-1.5 py-0.5 rounded text-indigo-300">rtmp://localhost/live</code>
+                      Server: <code className="bg-gray-800 px-1.5 py-0.5 rounded text-indigo-300">rtmp://mirrox-f43f.onrender.com/live</code>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-indigo-400 font-bold shrink-0">4</span>

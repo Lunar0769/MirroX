@@ -26,7 +26,7 @@ export default function HostRoom({ roomId }: { roomId: string }) {
   } catch (e) {
     console.error("Failed to parse media server URL:", e);
   }
-  const rtmpServer = `rtmp://${rtmpHostname}/live`;
+  const rtmpServer = process.env.NEXT_PUBLIC_RTMP_SERVER_URL || `rtmp://${rtmpHostname}/live`;
   const streamKey = roomId;
   const hlsUrl = `${mediaServerUrl}/live/${roomId}/index.m3u8`;
 
